@@ -208,6 +208,7 @@ void reset_list(list *lst)
 {
     lst->head = NULL;
     lst->tail = NULL;
+    free(lst);
 }
 
 // traverses list and applies func on data values of all elements in the list
