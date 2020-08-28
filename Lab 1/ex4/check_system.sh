@@ -8,12 +8,12 @@
 ####################
 
 # fill the below up
-hostname= $(hostname)
-kernel_version= $(uname-r)
-process_cnt= $(ps aux | wc -l)
-user_process_cnt= $(ps -U $USER -u $USER u | wc -l)
-mem_usage= $(free | grep Mem | awk '{print $3/$2 * 100.0}')
-swap_usage= $(free | grep Swap | awk '{print $3/$2 * 100.0}')
+hostname=$(hostname)
+kernel_version=$(uname -r)
+process_cnt=$(ps aux | wc -l)
+user_process_cnt=$(ps -U $USER -u $USER u | wc -l)
+mem_usage=$(free | grep Mem | awk '{print $3/$2 * 100.0}')
+swap_usage=$(free | grep Swap | awk '{print $3/$2 * 100.0}')
 
 echo "Hostname: $hostname"
 echo "Linux Kernel Version: $kernel_version"
