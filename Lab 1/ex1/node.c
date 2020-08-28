@@ -69,11 +69,13 @@ void insert_node_from_head_at(list *lst, int index, int data)
         {
             // printf("beg");
             insert_at_beginning(lst, data);
+            free(new_node);
         }
         else if (head->next == NULL)
         {
             // printf("end");
             insert_at_end(lst, data);
+            free(new_node);
         }
         else
         {
@@ -120,11 +122,13 @@ void insert_node_from_tail_at(list *lst, int index, int data)
         {
             // printf("end");
             insert_at_end(lst, data);
+            free(new_node);
         }
         else if (tail->prev == NULL)
         {
             // printf("beg");
             insert_at_beginning(lst, data);
+            free(new_node);
         }
         else
         {
