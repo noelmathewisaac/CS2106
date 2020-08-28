@@ -2,18 +2,18 @@
 
 ####################
 # Lab 1 Exercise 4
-# Name:
-# Student No:
-# Lab Group: 
+# Name: Noel Mathew Isaac
+# Student No: A0202072Y
+# Lab Group: 3
 ####################
 
 # fill the below up
-hostname=
-kernel_version=
-process_cnt=
-user_process_cnt=
-mem_usage=
-swap_usage=
+hostname= $(hostname)
+kernel_version= $(uname-r)
+process_cnt= $(ps aux | wc -l)
+user_process_cnt= $(ps -U $USER -u $USER u | wc -l)
+mem_usage= $(free | grep Mem | awk '{print $3/$2 * 100.0}')
+swap_usage= $(free | grep Swap | awk '{print $3/$2 * 100.0}')
 
 echo "Hostname: $hostname"
 echo "Linux Kernel Version: $kernel_version"
