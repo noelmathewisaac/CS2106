@@ -2,9 +2,9 @@
 
 ####################
 # Lab 1 Exercise 5
-# Name:
-# Student No:
-# Lab Group: 
+# Name: Noel Mathew Isaac
+# Student No: A0202072Y
+# Lab Group: 3
 ####################
 
 echo "Printing system call report"

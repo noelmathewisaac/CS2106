@@ -1,8 +1,8 @@
 /*************************************
 * Lab 1 Exercise 2
-* Name:
-* Student No:
-* Lab Group:
+* Name: Noel Mathew Isaac
+* Student No: A0202072Y
+* Lab Group: 3
 *************************************/
 
 //declare your func_list array here
