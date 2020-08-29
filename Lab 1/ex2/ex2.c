@@ -52,9 +52,11 @@ int main(int argc, char **argv)
 
     int instr;
 
-    while (!feof(fp))
+    while (1)
     {
         fscanf(fp, "%d", &instr);
+        if (feof(fp))
+            break;
         run_instruction(fp, lst, instr);
     }
     fclose(fp);
