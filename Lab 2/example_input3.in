@@ -1,0 +1,7 @@
+startlog /bin/echo hello | /bin/cat | /bin/sha256sum
+start /bin/true
+wait 0
+status
+showlog 0
+showlog 1
+shutdown

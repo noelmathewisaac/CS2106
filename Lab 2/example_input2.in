@@ -1,0 +1,5 @@
+start /bin/echo hello | /bin/cat | /bin/sha256sum
+start /bin/sleep 10
+status
+wait 1
+shutdown

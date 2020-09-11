@@ -1,0 +1,8 @@
+start /bin/sleep 10
+start /bin/sleep 15
+status
+stop 0
+wait 1
+wait 0
+stop 1
+shutdown
