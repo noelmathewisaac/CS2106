@@ -10,6 +10,9 @@
 // Use this function to any initialisation if you need to.
 void sm_init(void)
 {
+    pid_t pid;
+    char *path;
+    bool running;
 }
 
 // Use this function to do any cleanup of resources.
@@ -20,16 +23,28 @@ void sm_free(void)
 // Exercise 1a/2: start services
 void sm_start(const char *processes[])
 {
-    int a = fork();
-    if (a == 0)
+    int id = fork();
+    if (id == 0)
     {
+        pid = getpid();
+        path = processes[1];
+        running = true;
         execv(processes[0], processes);
     }
+    wait();
+    running = false;
 }
 
 // Exercise 1b: print service status
 size_t sm_status(sm_status_t statuses[])
 {
+    for (int i = 0; i < 1; i++)
+    {
+        statuses[i].path = path;
+        statuses[i].pid = pid;
+        statuses[i].running = running;
+    }
+    return 1;
 }
 
 // Exercise 3: stop service, wait on service, and shutdown
