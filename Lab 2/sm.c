@@ -10,9 +10,7 @@
 // Use this function to any initialisation if you need to.
 void sm_init(void)
 {
-    pid_t pid;
-    char *path;
-    bool running;
+  
 }
 
 // Use this function to do any cleanup of resources.
