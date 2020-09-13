@@ -6,17 +6,21 @@
  */
 
 #include "sm.h"
+#include <sys/wait.h>
+#include <stdlib.h>
 
-pid_t pid;
-char *path;
-bool running;
+pid_t pid[32];
+char path[32][32];
+bool running[32];
+int process_count;
+int status;
 
 // Use this function to any initialisation if you need to.
 void sm_init(void)
 {
-    pid = 0;
-    path ='';
-    running = false;
+    pid[0] = getpid();
+    running[0] = false;
+    process_count = 0;
 }
 
 // Use this function to do any cleanup of resources.
@@ -30,25 +34,32 @@ void sm_start(const char *processes[])
     int id = fork();
     if (id == 0)
     {
-        pid = getpid();
-        path = processes[1];
-        running = true;
         execv(processes[0], processes);
     }
-    wait();
-    running = false;
+    else
+    {
+        pid[process_count] = id;
+        strcpy(path[process_count], processes[0]);
+        running[process_count] = true;
+    }
+
+    process_count++;
 }
 
 // Exercise 1b: print service status
 size_t sm_status(sm_status_t statuses[])
 {
-    for (int i = 0; i < 1; i++)
+    for (int i = 0; i < process_count; i++)
     {
-        statuses[i].path = path;
-        statuses[i].pid = pid;
-        statuses[i].running = running;
+        if (waitpid(pid[i], &status, WNOHANG) != 0)
+        {
+            running[i] = false;
+        }
+        statuses[i].path = path[i];
+        statuses[i].pid = pid[i];
+        statuses[i].running = running[i];
     }
-    return 1;
+    return process_count;
 }
 
 // Exercise 3: stop service, wait on service, and shutdown
