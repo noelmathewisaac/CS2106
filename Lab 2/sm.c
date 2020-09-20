@@ -120,14 +120,14 @@ void sm_start(const char *processes[])
                         close(fds[process_count][READ_END]);
                         dup2(fds[process_count - 1][READ_END], STDIN_FILENO);
                         dup2(fds[process_count][WRITE_END], STDOUT_FILENO);
-                        for (int i = 0; i < num_processes - 1; i++)
-                        {
-                            if (!(i == process_count || i == process_count - 1))
-                            {
-                                close(fds[i][READ_END]);
-                                close(fds[i][WRITE_END]);
-                            }
-                        }
+                        // for (int i = 0; i < num_processes - 1; i++)
+                        // {
+                        //     if (!(i == process_count || i == process_count - 1))
+                        //     {
+                        //         close(fds[i][READ_END]);
+                        //         close(fds[i][WRITE_END]);
+                        //     }
+                        // }
                         execv(ind_process[0], ind_process);
                     }
                 }
