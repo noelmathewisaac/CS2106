@@ -18,12 +18,12 @@
 #define READ_END 0
 #define WRITE_END 1
 
-pid_t pid[32];
-char path[32][32];
-bool running[32];
+pid_t pid[1000];
+char path[1000][100];
+bool running[1000];
 int total_process_count;
 int status;
-int output[32];
+int services[32];
 int service_index = 0;
 int pipefd[2];
 
@@ -51,7 +51,7 @@ void sm_start(const char *processes[])
     int process_count = 0;
     int fds[31][2];
 
-    //count number of arguments and processes (except last NULL for piped processes)
+    //count number of arguments and processes in the service (except last NULL for piped processes)
     while (!(*ptr == NULL && *(ptr - 1) == NULL))
     {
         count++;
@@ -62,6 +62,7 @@ void sm_start(const char *processes[])
         ptr++;
     }
 
+    //Make n-1 pipes for n processes
     for (int i = 0; i < num_processes - 1; i++)
     {
         pipe(fds[i]);
@@ -70,9 +71,11 @@ void sm_start(const char *processes[])
     for (int i = 0; i < count; i++)
     {
 
+        //iterate through array, store the strings for each process to a new array and perform fork, dup, exec
         if (processes[i] == NULL)
         {
-            char *ind_process[32];
+            char *ind_process[1000];
+
             for (int j = 0; j < pos1 - pos2 + 1; j++)
             {
                 ind_process[j] = (char *)processes[pos2 + j];
@@ -83,13 +86,22 @@ void sm_start(const char *processes[])
             //child process
             if (id == 0)
             {
+                //multiprocess service
                 if (num_processes > 1)
                 {
+                    //First process in a service
                     if (process_count == 0)
                     {
+                        //close the read end of the first pipe and the STD input of the process
                         close(fds[process_count][READ_END]);
                         close(STDIN_FILENO);
+
+                        //connect the STD output of the process to the write end of the pipe.
+                        //The output from exec will be redirected to the pipe
                         dup2(fds[process_count][WRITE_END], STDOUT_FILENO);
+
+                        //close all the unused pipe ends
+                        //(all the used ends will be closed automatically after exec)
                         for (int i = 0; i < num_processes - 1; i++)
                         {
                             if (i != process_count - 1)
@@ -100,10 +112,18 @@ void sm_start(const char *processes[])
                         }
                         execv(ind_process[0], ind_process);
                     }
+
+                    //Last process in a service
                     else if (process_count + 1 == num_processes)
                     {
+                        //close the write end of the last pipe
                         close(fds[process_count - 1][WRITE_END]);
+
+                        //connect the STD input of the process to the read end of the pipe.
+                        //The output from the pipe will be redirected to process
                         dup2(fds[process_count - 1][READ_END], STDIN_FILENO);
+
+                        //close all the unused pipe ends
                         for (int i = 0; i < num_processes - 1; i++)
                         {
                             if (i != process_count - 1)
@@ -114,12 +134,21 @@ void sm_start(const char *processes[])
                         }
                         execv(ind_process[0], ind_process);
                     }
+
+                    //For in between processes (if number of processes > 2). This process is in bewtween 2 pipes.
                     else
                     {
+                        //close the write end of the previous pipe
+                        //connect the STD input of the process to the read end of the pipe.
                         close(fds[process_count - 1][WRITE_END]);
-                        close(fds[process_count][READ_END]);
                         dup2(fds[process_count - 1][READ_END], STDIN_FILENO);
+
+                        //close the read end of the next pipe
+                        //connect the STD output of the process to the write end of the pipe.
+                        close(fds[process_count][READ_END]);
                         dup2(fds[process_count][WRITE_END], STDOUT_FILENO);
+
+                        //close all ununsed pipe ends
                         for (int i = 0; i < num_processes - 1; i++)
                         {
                             if (!(i == process_count || i == process_count - 1))
@@ -139,17 +168,20 @@ void sm_start(const char *processes[])
 
             // parent process
 
+            //store all the process details into arrays
             pid[total_process_count] = id;
             strcpy(path[total_process_count], ind_process[0]);
             running[total_process_count] = true;
 
+            //update couters
             pos2 = pos1 + 1;
             process_count++;
             total_process_count++;
 
+            //Update service count
             if (i + 1 == count)
             {
-                output[service_index] = total_process_count - 1;
+                services[service_index] = total_process_count - 1;
                 service_index++;
             }
         }
@@ -168,6 +200,7 @@ size_t sm_status(sm_status_t statuses[])
 {
     for (int i = 0; i < total_process_count; i++)
     {
+        //check if process finished
         if (waitpid(pid[i], &status, WNOHANG) != 0)
         {
             running[i] = false;
@@ -176,9 +209,9 @@ size_t sm_status(sm_status_t statuses[])
 
     for (int i = 0; i < service_index; i++)
     {
-        statuses[i].path = path[output[i]];
-        statuses[i].pid = pid[output[i]];
-        statuses[i].running = running[output[i]];
+        statuses[i].path = path[services[i]];
+        statuses[i].pid = pid[services[i]];
+        statuses[i].running = running[services[i]];
     }
 
     return service_index;
@@ -190,8 +223,9 @@ void sm_stop(size_t index)
     int initial = 0;
     if (index == 0)
     {
-        for (int i = 0; i <= output[index]; i++)
+        for (int i = 0; i <= services[index]; i++)
         {
+            //check if process is running
             if (waitpid(pid[i], &status, WNOHANG) == 0)
             {
                 kill(pid[i], SIGTERM);
@@ -200,9 +234,9 @@ void sm_stop(size_t index)
     }
     else
     {
-        initial = output[index - 1];
+        initial = services[index - 1];
 
-        for (int i = initial + 1; i <= output[index]; i++)
+        for (int i = initial + 1; i <= services[index]; i++)
         {
             if (waitpid(pid[i], &status, WNOHANG) == 0)
             {
@@ -217,7 +251,7 @@ void sm_wait(size_t index)
     int initial = 0;
     if (index == 0)
     {
-        for (int i = 0; i <= output[index]; i++)
+        for (int i = 0; i <= services[index]; i++)
 
         {
             if (waitpid(pid[i], &status, WNOHANG) == 0)
@@ -228,9 +262,9 @@ void sm_wait(size_t index)
     }
     else
     {
-        initial = output[index - 1];
+        initial = services[index - 1];
 
-        for (int i = initial + 1; i <= output[index]; i++)
+        for (int i = initial + 1; i <= services[index]; i++)
         {
             if (waitpid(pid[i], &status, WNOHANG) == 0)
             {
@@ -280,7 +314,7 @@ void sm_startlog(const char *processes[])
 
         if (processes[i] == NULL)
         {
-            char *ind_process[32];
+            char *ind_process[1000];
             for (int j = 0; j < pos1 - pos2 + 1; j++)
             {
                 ind_process[j] = (char *)processes[pos2 + j];
@@ -415,7 +449,7 @@ void sm_startlog(const char *processes[])
 
             if (i + 1 == count)
             {
-                output[service_index] = total_process_count - 1;
+                services[service_index] = total_process_count - 1;
                 service_index++;
             }
         }
