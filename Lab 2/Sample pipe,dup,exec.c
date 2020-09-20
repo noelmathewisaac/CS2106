@@ -50,7 +50,7 @@ int main(int argc, char const *argv[])
             {
                 close(pipefd2[WRITE_END]);
                 dup2(pipefd2[READ_END], STDIN_FILENO);
-                execlp(argv[4], argv[4], argv[5], NULL);
+                execlp(argv[4], argv[4], NULL);
             }
         }
 

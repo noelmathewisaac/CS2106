@@ -90,28 +90,28 @@ void sm_start(const char *processes[])
                         close(fds[process_count][READ_END]);
                         close(STDIN_FILENO);
                         dup2(fds[process_count][WRITE_END], STDOUT_FILENO);
-                        // for (int i = 0; i < num_processes - 1; i++)
-                        // {
-                        //     if (i != process_count - 1)
-                        //     {
-                        //         close(fds[i][READ_END]);
-                        //         close(fds[i][WRITE_END]);
-                        //     }
-                        // }
+                        for (int i = 0; i < num_processes - 1; i++)
+                        {
+                            if (i != process_count - 1)
+                            {
+                                close(fds[i][READ_END]);
+                                close(fds[i][WRITE_END]);
+                            }
+                        }
                         execv(ind_process[0], ind_process);
                     }
                     else if (process_count + 1 == num_processes)
                     {
                         close(fds[process_count - 1][WRITE_END]);
                         dup2(fds[process_count - 1][READ_END], STDIN_FILENO);
-                        // for (int i = 0; i < num_processes - 1; i++)
-                        // {
-                        //     if (i != process_count - 1)
-                        //     {
-                        //         close(fds[i][READ_END]);
-                        //         close(fds[i][WRITE_END]);
-                        //     }
-                        // }
+                        for (int i = 0; i < num_processes - 1; i++)
+                        {
+                            if (i != process_count - 1)
+                            {
+                                close(fds[i][READ_END]);
+                                close(fds[i][WRITE_END]);
+                            }
+                        }
                         execv(ind_process[0], ind_process);
                     }
                     else
@@ -120,14 +120,14 @@ void sm_start(const char *processes[])
                         close(fds[process_count][READ_END]);
                         dup2(fds[process_count - 1][READ_END], STDIN_FILENO);
                         dup2(fds[process_count][WRITE_END], STDOUT_FILENO);
-                        // for (int i = 0; i < num_processes - 1; i++)
-                        // {
-                        //     if (!(i == process_count || i == process_count - 1))
-                        //     {
-                        //         close(fds[i][READ_END]);
-                        //         close(fds[i][WRITE_END]);
-                        //     }
-                        // }
+                        for (int i = 0; i < num_processes - 1; i++)
+                        {
+                            if (!(i == process_count || i == process_count - 1))
+                            {
+                                close(fds[i][READ_END]);
+                                close(fds[i][WRITE_END]);
+                            }
+                        }
                         execv(ind_process[0], ind_process);
                     }
                 }
@@ -298,28 +298,28 @@ void sm_startlog(const char *processes[])
                         close(fds[process_count][READ_END]);
                         close(STDIN_FILENO);
                         dup2(fds[process_count][WRITE_END], STDOUT_FILENO);
-                        // for (int i = 0; i < num_processes - 1; i++)
-                        // {
-                        //     if (i != process_count - 1)
-                        //     {
-                        //         close(fds[i][READ_END]);
-                        //         close(fds[i][WRITE_END]);
-                        //     }
-                        // }
+                        for (int i = 0; i < num_processes - 1; i++)
+                        {
+                            if (i != process_count - 1)
+                            {
+                                close(fds[i][READ_END]);
+                                close(fds[i][WRITE_END]);
+                            }
+                        }
                         execv(ind_process[0], ind_process);
                     }
                     else if (process_count + 1 == num_processes)
                     {
                         close(fds[process_count - 1][WRITE_END]);
                         dup2(fds[process_count - 1][READ_END], STDIN_FILENO);
-                        // for (int i = 0; i < num_processes - 1; i++)
-                        // {
-                        //     if (i != process_count - 1)
-                        //     {
-                        //         close(fds[i][READ_END]);
-                        //         close(fds[i][WRITE_END]);
-                        //     }
-                        // }
+                        for (int i = 0; i < num_processes - 1; i++)
+                        {
+                            if (i != process_count - 1)
+                            {
+                                close(fds[i][READ_END]);
+                                close(fds[i][WRITE_END]);
+                            }
+                        }
                         char filename[15];
                         snprintf(filename, 15, "service%d.log", service_index);
                         int out = open(filename, O_RDWR | O_CREAT | O_APPEND, 0600);
