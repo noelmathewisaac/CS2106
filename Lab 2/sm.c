@@ -18,9 +18,9 @@
 #define READ_END 0
 #define WRITE_END 1
 
-pid_t pid[1000];
-char path[1000][100];
-bool running[1000];
+pid_t pid[2048];
+char path[2048][200];
+bool running[2048];
 int total_process_count;
 int status;
 int services[32];
@@ -29,9 +29,6 @@ int service_index = 0;
 // Use this function to any initialisation if you need to.
 void sm_init(void)
 {
-    pid[0] = getpid();
-    running[0] = false;
-    total_process_count = 0;
 }
 
 // Use this function to do any cleanup of resources.
