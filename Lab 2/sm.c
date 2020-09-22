@@ -25,7 +25,6 @@ int total_process_count;
 int status;
 int services[32];
 int service_index = 0;
-int pipefd[2];
 
 // Use this function to any initialisation if you need to.
 void sm_init(void)

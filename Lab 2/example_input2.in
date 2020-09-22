@@ -3,5 +3,3 @@ start /bin/sleep 10
 status
 wait 1
 shutdown
-
-start /bin/echo hello | /bin/echo yo | /bin/sha256sum
