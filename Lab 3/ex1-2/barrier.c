@@ -36,14 +36,12 @@ void barrier_wait(barrier_t *barrier)
         //If all threads reach barrier set counter to 0 and signal
         // sync_lock count times
         barrier->counter = 0;
-        for (int i = 0; i < barrier->count; i++)
-        {
-            sem_post(&barrier->sync_lock);
-        }
+        sem_post(&barrier->sync_lock);
     }
     else
     { //wait till all threads reach barrier
         sem_wait(&barrier->sync_lock);
+        sem_post(&barrier->sync_lock);
     }
 }
 
