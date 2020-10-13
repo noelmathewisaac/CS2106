@@ -30,7 +30,7 @@ void exit_controller_wait(exit_controller_t *exit_controller, int priority)
         //Increment p0 count
         sem_wait(&exit_controller->mutex);
         exit_controller->p0_count++;
-        printf("----------\nWaiting\nP0 count -> %d; p1 count -> %d; priority -> %d\n------------\n", exit_controller->p0_count, exit_controller->p1_count, priority);
+        // printf("----------\nWaiting\nP0 count -> %d; p1 count -> %d; priority -> %d\n------------\n", exit_controller->p0_count, exit_controller->p1_count, priority);
         sem_post(&exit_controller->mutex);
 
         //wait to enter exit line
@@ -39,19 +39,17 @@ void exit_controller_wait(exit_controller_t *exit_controller, int priority)
         //decrement p0 count and signal if there are no more trains with priority 0 waiting
         sem_wait(&exit_controller->mutex);
         exit_controller->p0_count--;
-        pthread_mutex_lock(&exit_controller->mu);
         if (exit_controller->p0_count == 0)
-            pthread_cond_signal(&exit_controller->priority_zero);
-        pthread_mutex_unlock(&exit_controller->mu);
-        printf("----------\nExit line entered\nP0 count -> %d; p1 count -> %d; priority -> %d\n------------\n", exit_controller->p0_count, exit_controller->p1_count, priority);
+            pthread_cond_broadcast(&exit_controller->priority_zero);
         sem_post(&exit_controller->mutex);
+        // printf("----------\nExit line entered\nP0 count -> %d; p1 count -> %d; priority -> %d\n------------\n", exit_controller->p0_count, exit_controller->p1_count, priority);
     }
     else
     {
         //increment p1_count
         sem_wait(&exit_controller->mutex);
         exit_controller->p1_count++;
-        printf("----------\nWaiting\nP0 count -> %d; p1 count -> %d; priority -> %d\n------------\n", exit_controller->p0_count, exit_controller->p1_count, priority);
+        // printf("----------\nWaiting\nP0 count -> %d; p1 count -> %d; priority -> %d\n------------\n", exit_controller->p0_count, exit_controller->p1_count, priority);
         sem_post(&exit_controller->mutex);
 
         //block if there are any trains with priority 0 waiting
@@ -66,7 +64,7 @@ void exit_controller_wait(exit_controller_t *exit_controller, int priority)
         sem_wait(&exit_controller->mutex);
         sem_wait(&exit_controller->exit_line);
         exit_controller->p1_count--;
-        printf("----------\nExit line entered\nP0 count -> %d; p1 count -> %d; priority -> %d\n------------\n", exit_controller->p0_count, exit_controller->p1_count, priority);
+        // printf("----------\nExit line entered\nP0 count -> %d; p1 count -> %d; priority -> %d\n------------\n", exit_controller->p0_count, exit_controller->p1_count, priority);
         sem_post(&exit_controller->mutex);
     }
 }

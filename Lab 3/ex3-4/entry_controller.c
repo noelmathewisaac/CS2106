@@ -8,7 +8,7 @@
 void entry_controller_init(entry_controller_t *entry_controller, int loading_bays)
 {
     sem_init(&entry_controller->mutex1, 0, 1);
-    sem_init(&entry_controller->bay_lock, 0, loading_bays);
+    sem_init(&entry_controller->bay_lock, 0, loading_bays + 1);
     entry_controller->head_index = -1;
     entry_controller->tail_index = 0;
     entry_controller->num_bays = loading_bays;
