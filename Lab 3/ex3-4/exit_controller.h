@@ -19,7 +19,6 @@ typedef struct exit_controller
     sem_t mutex;
     pthread_cond_t priority_zero;
     pthread_mutex_t mu;
-    int counter;
     int p1_count;
     int p0_count;
 

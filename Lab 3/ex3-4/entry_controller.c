@@ -19,16 +19,15 @@ void entry_controller_wait(entry_controller_t *entry_controller)
 {
 
     //Add train to queue
-
     sem_wait(&entry_controller->mutex1);
     sem_init(&entry_controller->queue[entry_controller->tail_index], 0, 1);
-    // sem_wait(&entry_controller->queue[entry_controller->tail_index]);
     entry_controller->tail_index++;
     sem_post(&entry_controller->mutex1);
 
     //Wait for loading bay slot
     sem_wait(&entry_controller->bay_lock);
 
+    //Allows the first train in queue to enter the bay
     sem_wait(&entry_controller->mutex1);
     sem_wait(&entry_controller->queue[entry_controller->head_index++]);
     sem_post(&entry_controller->mutex1);

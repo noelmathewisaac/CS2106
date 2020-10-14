@@ -17,7 +17,6 @@ void exit_controller_init(exit_controller_t *exit_controller, int no_of_prioriti
     pthread_cond_init(&exit_controller->priority_zero, NULL);
     pthread_mutex_init(&exit_controller->mu, NULL);
 
-    exit_controller->counter = 0;
     exit_controller->p0_count = 0;
     exit_controller->p1_count = 0;
 }
@@ -78,4 +77,6 @@ void exit_controller_destroy(exit_controller_t *exit_controller)
 {
     sem_destroy(&exit_controller->exit_line);
     sem_destroy(&exit_controller->mutex);
+    pthread_cond_destroy(&exit_controller->priority_zero);
+    pthread_mutex_destroy(&exit_controller->mu);
 }
