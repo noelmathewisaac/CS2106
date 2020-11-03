@@ -21,14 +21,18 @@ requirements in the lab document.  If you declare additional names (helper struc
 typedef struct
 {
     size_t sz;
-    char data[];
-} shmheap_block;
+    char *ptr;
+    char *next;
+
+} shmheap_node;
 
 typedef struct
 {
     size_t sz;
-    char data[];
-} shmheap_node;
+    char *ptr;
+    char *next;
+
+} shmheap_block;
 
 // } shmheap_object_handle;
 typedef shmheap_block *shmheap_memory_handle;

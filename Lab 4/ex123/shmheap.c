@@ -16,11 +16,11 @@
 shmheap_memory_handle shmheap_create(const char *name, size_t len)
 {
     /* TODO */
-    int shm_fd = shm_open(name, O_CREAT | O_RDWR, 0666);
+    int shm_fd = shm_open(name, O_CREAT | O_RDWR, 0777);
     ftruncate(shm_fd, len);
     void *ptr = mmap(NULL, len, PROT_READ | PROT_WRITE, MAP_SHARED, shm_fd, 0);
     shmheap_memory_handle handle = malloc(sizeof(shmheap_memory_handle));
-    handle->data[0] = ptr;
+    handle->ptr = ptr;
     handle->sz = len;
     return handle;
 }
@@ -28,13 +28,13 @@ shmheap_memory_handle shmheap_create(const char *name, size_t len)
 shmheap_memory_handle shmheap_connect(const char *name)
 {
     /* TODO */
-    int shm_fd = shm_open(name, O_RDWR, 0666);
+    int shm_fd = shm_open(name, O_RDWR, 0777);
     struct stat buf;
     fstat(shm_fd, &buf);
     off_t size = buf.st_size;
     void *ptr = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_SHARED, shm_fd, 0);
     shmheap_memory_handle handle = malloc(sizeof(shmheap_memory_handle));
-    handle->data[0] = ptr;
+    handle->ptr = ptr;
     handle->sz = size;
     return handle;
 }
@@ -42,7 +42,7 @@ shmheap_memory_handle shmheap_connect(const char *name)
 void shmheap_disconnect(shmheap_memory_handle mem)
 {
     /* TODO */
-    munmap(mem->data, mem->sz);
+    munmap(mem->ptr, mem->sz);
 }
 
 void shmheap_destroy(const char *name, shmheap_memory_handle mem)
@@ -60,13 +60,14 @@ void *shmheap_underlying(shmheap_memory_handle mem)
 void *shmheap_alloc(shmheap_memory_handle mem, size_t sz)
 {
     /* TODO */
-    printf("lol");
+
     size_t rounded_size = ((sz + 7) & (-8));
     shmheap_node *node = malloc(sizeof(shmheap_node));
-    node->data[0] = mem->data[0] + rounded_size;
-    node->sz = rounded_size;
-    mem->data[0] = node;
-    return node;
+    node->sz = rounded_size | 1; //Last bit ORed with 1 to represent that its allocated.
+    node->ptr = mem->ptr + sizeof(mem);
+    mem->next = node->ptr;
+
+    return node->ptr;
 }
 
 void shmheap_free(shmheap_memory_handle mem, void *ptr)
