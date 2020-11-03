@@ -59,10 +59,10 @@ void run_instruction(list *lst, int instr)
         scanf("%d", &index);
         delete_node_from_head_at(lst, index);
         break;
-     case DELETE_FROM_TAIL_AT:
+    case DELETE_FROM_TAIL_AT:
         scanf("%d", &index);
         delete_node_from_tail_at(lst, index);
-        break;   
+        break;
     case RESET_LIST:
         reset_list(lst);
     }
