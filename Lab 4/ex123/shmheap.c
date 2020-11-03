@@ -1,8 +1,8 @@
 /*************************************
 * Lab 4
-* Name:
-* Student No:
-* Lab Group:
+* Name: Noel Mathew Isaac
+* Student No: A0202072Y
+* Lab Group: 3
 *************************************/
 
 #include "shmheap.h"
@@ -22,6 +22,10 @@ shmheap_memory_handle shmheap_create(const char *name, size_t len)
     shmheap_memory_handle handle = malloc(sizeof(shmheap_memory_handle));
     handle->ptr = ptr;
     handle->sz = len;
+    shmheap_node *node = malloc(sizeof(shmheap_node));
+    node->sz = len - sizeof(handle);
+    node->ptr = handle->ptr + sizeof(handle);
+    handle->next = node;
     return handle;
 }
 
@@ -36,6 +40,10 @@ shmheap_memory_handle shmheap_connect(const char *name)
     shmheap_memory_handle handle = malloc(sizeof(shmheap_memory_handle));
     handle->ptr = ptr;
     handle->sz = size;
+    shmheap_node *node = malloc(sizeof(shmheap_node));
+    node->sz = size - sizeof(handle);
+    node->ptr = handle->ptr + sizeof(handle);
+    handle->next = node;
     return handle;
 }
 
@@ -55,24 +63,61 @@ void shmheap_destroy(const char *name, shmheap_memory_handle mem)
 void *shmheap_underlying(shmheap_memory_handle mem)
 {
     /* TODO */
+    return (void *)mem->ptr;
 }
 
 void *shmheap_alloc(shmheap_memory_handle mem, size_t sz)
 {
     /* TODO */
 
-    size_t rounded_size = ((sz + 7) & (-8));
-    shmheap_node *node = malloc(sizeof(shmheap_node));
-    node->sz = rounded_size | 1; //Last bit ORed with 1 to represent that its allocated.
-    node->ptr = mem->ptr + sizeof(mem);
-    mem->next = node->ptr;
-
-    return node->ptr;
+    size_t rounded_size = ((sz + 7) & (-8)); //rounding to next higher mutiple of 8
+    shmheap_node *curr = mem->next;
+    while (curr != NULL)
+    {
+        if (curr->sz >= rounded_size && (curr->sz & 1) == 0)
+        {
+            shmheap_node *next = malloc(sizeof(shmheap_node));
+            next->sz = (curr->sz & -2) - rounded_size;
+            next->ptr = curr->ptr + rounded_size + sizeof(curr);
+            curr->sz = rounded_size | 1; //Last bit ORed with 1 to indicate that its allocated.
+            curr->next = next;
+            return curr->ptr;
+        }
+        curr = curr->next;
+    }
 }
 
 void shmheap_free(shmheap_memory_handle mem, void *ptr)
 {
     /* TODO */
+    shmheap_node *curr = mem->next;
+    shmheap_node *prev;
+
+    while (curr != NULL)
+    {
+        if (curr->ptr == (char *)ptr)
+        {
+            curr->sz = (curr->sz & -2); // Set the last bit to 0 to indicate free node
+            if ((curr->next->sz & 1) == 0)
+            {
+                curr->sz = curr->sz + curr->next->sz;
+                curr->next = curr->next->next;
+            }
+            if (prev != NULL)
+            {
+                if ((prev->sz & 1) == 0)
+                {
+                    {
+                        prev->sz = prev->sz + curr->sz;
+                        prev->next = curr->next;
+                    }
+                }
+            }
+            break;
+        }
+        prev = curr;
+        curr = curr->next;
+    }
 }
 
 shmheap_object_handle shmheap_ptr_to_handle(shmheap_memory_handle mem, void *ptr)
