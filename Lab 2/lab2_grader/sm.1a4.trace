@@ -1,6 +1,0 @@
-----------testeepid: 1771
-----------command: start /bin/sleep 5
-/mnt/c/Users/noelm/Downloads/lab2_grader/strace: /lib/x86_64-linux-gnu/libc.so.6: version `GLIBC_2.28' not found (required by /mnt/c/Users/noelm/Downloads/lab2_grader/strace)
-----------command: start ./___sf
-----------command: start ./___sfa e71a613c-70d7-4603-8f9c-95f97232e8eb 977264d7-bd96-4f12-ae63-51c843ee1576 65c1628d-9cc6-4589-8d17-8e3acc06f9a3
-----------exitcode: 1

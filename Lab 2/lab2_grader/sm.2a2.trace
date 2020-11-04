@@ -1,4 +1,0 @@
-----------testeepid: 1995
-----------command: start /bin/echo 0Et6AJWJ | /bin/cat -u | /bin/cat -uu | /bin/cat -uuu | /bin/cat -uuuu | /bin/echo CwDGx5kF | /bin/cat -uuuuu | /bin/cat -uuuuuu | /usr/bin/sha256sum
-/mnt/c/Users/noelm/Downloads/lab2_grader/strace: /lib/x86_64-linux-gnu/libc.so.6: version `GLIBC_2.28' not found (required by /mnt/c/Users/noelm/Downloads/lab2_grader/strace)
-----------exitcode: 1
