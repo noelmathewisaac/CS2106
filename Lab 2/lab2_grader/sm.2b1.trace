@@ -1,0 +1,8 @@
+----------testeepid: 2117
+----------command: start ./___sfa | ./___sfb | ./___sfc
+/mnt/c/Users/noelm/Downloads/lab2_grader/strace: /lib/x86_64-linux-gnu/libc.so.6: version `GLIBC_2.28' not found (required by /mnt/c/Users/noelm/Downloads/lab2_grader/strace)
+----------command: status
+----------command: status
+----------command: status
+----------command: status
+----------exitcode: 1

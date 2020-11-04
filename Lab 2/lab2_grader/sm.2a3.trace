@@ -1,0 +1,4 @@
+----------testeepid: 2040
+----------command: start ./___sf | ./___pr hello
+/mnt/c/Users/noelm/Downloads/lab2_grader/strace: /lib/x86_64-linux-gnu/libc.so.6: version `GLIBC_2.28' not found (required by /mnt/c/Users/noelm/Downloads/lab2_grader/strace)
+----------exitcode: 1
