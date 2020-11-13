@@ -62,18 +62,18 @@ const char *zc_read_start(zc_file *file, size_t *size)
     return NULL;
   }
 
-  else if (file->offset + size > sizeof(file))
+  else if (file->offset + *size > file->size)
 
   {
-    char *chunk = (char *)file->ptr;
+    char *chunk = (char *)file->ptr + file->offset;
     *size = file->size - file->offset;
-    file->offset = file->size + 1;
+    file->offset += *size;
     return chunk;
   }
   else
   {
-    char *chunk = (char *)file->ptr;
-    file->offset += size;
+    char *chunk = (char *)file->ptr + file->offset;
+    file->offset += *size;
     return chunk;
   }
 }
