@@ -1,7 +1,7 @@
 #include "zc_io.h"
 #include <fcntl.h>
 #include <unistd.h>
-#include <stdio.h>
+#include <string.h>
 #include <stdlib.h>
 #include <sys/stat.h>
 #include <sys/mman.h>
@@ -203,5 +203,21 @@ off_t zc_lseek(zc_file *file, long offset, int whence)
 int zc_copyfile(const char *source, const char *dest)
 {
   // To implement
-  return -1;
+  //open destination and source files
+  zc_file *src_file = zc_open(source);
+  zc_file *dst_file = zc_open(dest);
+
+  //Use ftruncate and mremap to ensure that the dest file has the same size as the source file
+  ftruncate(dst_file->fd, src_file->size);
+  dst_file->ptr = mremap(dst_file->ptr, dst_file->size, src_file->size, MREMAP_MAYMOVE);
+  dst_file->size = src_file->size;
+  memcpy(dst_file->ptr, src_file->ptr, src_file->size);
+
+  //return -1 on failure
+  if (dst_file->ptr == (void *)-1)
+  {
+    return -1;
+  }
+
+  return 0;
 }
