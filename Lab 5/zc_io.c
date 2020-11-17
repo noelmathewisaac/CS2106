@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <sys/stat.h>
 #include <sys/mman.h>
-#include <pthread.h>
+#include <semaphore.h>
 
 // The zc_file struct is analogous to the FILE struct that you get from fopen.
 struct zc_file
@@ -15,8 +15,8 @@ struct zc_file
   int fd;
   int readers;
   size_t offset;
-  pthread_mutex_t r_mutex;
-  pthread_mutex_t wr_mutex;
+  sem_t r_mutex;
+  sem_t wr_mutex;
   // Insert the fields you need here.
 };
 
@@ -56,8 +56,8 @@ zc_file *zc_open(const char *path)
     file->offset = 0;
     file->fd = fd;
     file->readers = 0;
-    pthread_mutex_init(&file->r_mutex, NULL);
-    pthread_mutex_init(&file->wr_mutex, NULL);
+    sem_init(&file->r_mutex, 0, 1);
+    sem_init(&file->wr_mutex, 0, 1);
 
     return file;
   }
@@ -81,13 +81,13 @@ const char *zc_read_start(zc_file *file, size_t *size)
   {
     return NULL;
   }
-  pthread_mutex_lock(&file->r_mutex);
+  sem_wait(&file->r_mutex);
   file->readers++;
   if (file->readers == 1)
   {
-    pthread_mutex_lock(&file->wr_mutex);
+    sem_wait(&file->wr_mutex);
   }
-  pthread_mutex_unlock(&file->r_mutex);
+  sem_post(&file->r_mutex);
 
   if (file->offset + *size > file->size)
 
@@ -108,13 +108,13 @@ const char *zc_read_start(zc_file *file, size_t *size)
 void zc_read_end(zc_file *file)
 {
   // To implement
-  pthread_mutex_lock(&file->r_mutex);
+  sem_wait(&file->r_mutex);
   file->readers--;
   if (file->readers == 0)
   {
-    pthread_mutex_unlock(&file->wr_mutex);
+    sem_post(&file->wr_mutex);
   }
-  pthread_mutex_unlock(&file->r_mutex);
+  sem_post(&file->r_mutex);
 }
 
 /**************
@@ -124,12 +124,16 @@ void zc_read_end(zc_file *file)
 char *zc_write_start(zc_file *file, size_t size)
 {
   // To implement
-  pthread_mutex_lock(&file->wr_mutex);
+  sem_wait(&file->wr_mutex);
   //If file is not big enough for write, make it bigger using ftruncate and perform mremap
   if (file->offset + size >= file->size)
   {
     ftruncate(file->fd, file->offset + size);
     file->ptr = mremap(file->ptr, file->size, file->offset + size, MREMAP_MAYMOVE);
+    if (file->ptr == (void *)-1)
+    {
+      return NULL;
+    }
     char *chunk = (char *)file->ptr + file->offset;
     file->offset += size;
     return chunk;
@@ -145,7 +149,7 @@ char *zc_write_start(zc_file *file, size_t size)
 void zc_write_end(zc_file *file)
 {
   // To implement
-  pthread_mutex_unlock(&file->wr_mutex);
+  sem_post(&file->wr_mutex);
 }
 
 /**************
@@ -155,44 +159,44 @@ void zc_write_end(zc_file *file)
 off_t zc_lseek(zc_file *file, long offset, int whence)
 {
   // To implement
-  pthread_mutex_lock(&file->wr_mutex);
+  sem_wait(&file->wr_mutex);
 
   //If resulting offset becomes negative at any point, an error (-1) should be returned
   if (whence == SEEK_SET)
   {
     if (offset < 0)
     {
-      pthread_mutex_unlock(&file->wr_mutex);
+      sem_post(&file->wr_mutex);
       return -1;
     }
     file->offset = offset;
-    pthread_mutex_unlock(&file->wr_mutex);
+    sem_post(&file->wr_mutex);
     return file->offset;
   }
   if (whence == SEEK_CUR)
   {
 
-    if (file->offset + offset < 0)
+    if ((long)file->offset + offset < 0)
     {
-      pthread_mutex_unlock(&file->wr_mutex);
+      sem_post(&file->wr_mutex);
       return -1;
     }
     file->offset += offset;
-    pthread_mutex_unlock(&file->wr_mutex);
+    sem_post(&file->wr_mutex);
     return file->offset;
   }
   if (whence == SEEK_END)
   {
-    if (file->size + offset < 0)
+    if ((long)file->size + offset < 0)
     {
-      pthread_mutex_unlock(&file->wr_mutex);
+      sem_post(&file->wr_mutex);
       return -1;
     }
     file->offset = file->size + offset;
-    pthread_mutex_unlock(&file->wr_mutex);
+    sem_post(&file->wr_mutex);
     return file->offset;
   }
-  pthread_mutex_unlock(&file->wr_mutex);
+  sem_post(&file->wr_mutex);
   return -1;
 }
 
