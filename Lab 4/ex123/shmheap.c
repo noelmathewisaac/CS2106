@@ -72,8 +72,11 @@ void *shmheap_alloc(shmheap_memory_handle mem, size_t sz)
 
     size_t rounded_size = ((sz + 7) & (-8)); //rounding to next higher mutiple of 8
     shmheap_node *curr = mem->next;
+
+    //First fit allocation
     while (curr != NULL)
     {
+        //If size of node >= rewuired size and node is not occupied, allocate
         if (curr->sz >= rounded_size && (curr->sz & 1) == 0)
         {
             shmheap_node *next = malloc(sizeof(shmheap_node));
@@ -98,6 +101,8 @@ void shmheap_free(shmheap_memory_handle mem, void *ptr)
         if (curr->ptr == (char *)ptr)
         {
             curr->sz = (curr->sz & -2); // Set the last bit to 0 to indicate free node
+
+            //If next node is free, merge
             if ((curr->next->sz & 1) == 0)
             {
                 curr->sz = curr->sz + curr->next->sz;
@@ -105,6 +110,7 @@ void shmheap_free(shmheap_memory_handle mem, void *ptr)
             }
             if (prev != NULL)
             {
+                //If previous node is free, merge
                 if ((prev->sz & 1) == 0)
                 {
                     {
