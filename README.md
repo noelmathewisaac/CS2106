@@ -1,6 +1,6 @@
 # CS2106 - Introduction to Operating Systems (NUS)
 
-Lab assignment code and useful resources for CS2106.
+Lab assignment code and useful resources for CS2106 (Taken in AY20/21 Semester 1).
 
 ## Labs
 - [Lab 1](https://github.com/noelmathewisaac/CS2106/tree/master/Lab%201/lab1.pdf) - Introduction to C and Shell Scripting
