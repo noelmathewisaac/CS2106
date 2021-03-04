@@ -20,5 +20,5 @@ Lab assignment code and useful resources for CS2106 (Taken in AY20/21 Semester 1
 
 ### Textbooks
 - [The Little Book of Semaphores](http://greenteapress.com/semaphores/LittleBookOfSemaphores.pdf)
-- [Modern Operating Systems](https://github.com/rangaeeeee/books-os/blob/master/Modern%20Operating%20Systems%20-%204th%20Edition.pdf)
-- [Operating System Concepts](https://github.com/rangaeeeee/books-os/blob/master/Operating%20System%20Concepts%20-%209th%20Edition.pdf)
+- Modern Operating Systems
+- Operating System Concepts
